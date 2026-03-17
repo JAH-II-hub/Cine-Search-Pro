@@ -1,6 +1,6 @@
 body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
-.app-container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; }
-input { width: 100%; padding: 10px; margin-bottom: 20px; }
+.app-container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; }
+input { width: 100%; padding: 10px; margin-bottom: 10px;}
 
 .movie-card {
     padding: 10px;
