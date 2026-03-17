@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CineSearch Pro - Test 1</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <h1>CineSearch Pro</h1>
+        
+        <input type="text" id="search-input" placeholder="Search for a movie...">
+        
+        <div class="loading-spinner">Searching...</div>
+
+        <div id="results-list"></div>
+    </div>
+
+    <template id="movie-template">
+        <div class="movie-card">
+            <h3 class="title"></h3>
+        </div>
+    </template>
+
+    <script src="app.js"></script>
+</body>
+</html>
