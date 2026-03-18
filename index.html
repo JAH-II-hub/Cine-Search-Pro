@@ -6,22 +6,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
+    <div class="app-container" id="results-container" data-loading="false">
         <h1>CineSearch Pro</h1>
         
         <input type="text" id="search-input" placeholder="Search for a movie...">
         
-        <div class="loading-spinner">Searching...</div>
-
+        <div class="loading-spinner"></div>
+        
         <div id="results-list"></div>
     </div>
-
+    
     <template id="movie-template">
         <div class="movie-card">
             <h3 class="title"></h3>
         </div>
     </template>
-
     <script src="app.js"></script>
 </body>
 </html>

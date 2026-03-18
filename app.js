@@ -1,69 +1,82 @@
 class SearchComponent {
-  constructor() {
-    this.cache = new Map();
-    this.debounceTimer = null;
-    this.container = document.querySelector('.app-container');
-    this.input = document.querySelector('#search-input');
-    this.resultsList = document.querySelector('#results-list');
-    this.template = document.querySelector('#movie-template');
-    
-    this.setupListeners();
-  }
+    constructor() {
+        this.input = document.getElementById('search-input');
+        this.container = document.getElementById('results-container');
+        this.resultsList = document.getElementById('results-list');
+        
+        // 1. Map Cache
+        this.cache = new Map();
+        
+        this.timer = null;
+        this.apiKey = '3c0eeb100683cf1c22333b2d9fa29f79';
 
-  setupListeners() {
-    this.input.addEventListener('input', (e) => {
-      this.handleInput(e.target.value);
-    });
-  }
+        this.input.addEventListener('input', (e) => this.handleInput(e.target.value));
+    }
 
-  handleInput(query) {
-    clearTimeout(this.debounceTimer);
-    if (!query) {
+    // 2. Manual Debounce
+    handleInput(query) {
+        clearTimeout(this.timer);
+        if (!query.trim()) {
+            this.clearResults();
+            return;
+        }
+
+        this.timer = setTimeout(() => {
+            this.search(query);
+        }, 300);
+    }
+
+    async search(query) {
+        // Check Cache
+        if (this.cache.has(query)) {
+            console.log("From Cache");
+            this.render(this.cache.get(query));
+            return;
+        }
+
+        // Set Loading State
+        this.container.setAttribute('data-loading', 'true');
+
+        try {
+            // Fetch Data
+            const url = `https://api.themoviedb.org/3/search/movie?api_key=${this.apiKey}&query=${query}`;
+            const res = await fetch(url);
+            const data = await res.json();
+
+            // Save to Cache
+            this.cache.set(query, data.results);
+            
+            this.render(data.results);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            // Remove Loading State
+            this.container.setAttribute('data-loading', 'false');
+        }
+    }
+
+    render(movies) {
+        this.clearResults();
+        if (!movies) return;
+
+        const template = document.getElementById('movie-template');
+        
+        movies.forEach(m => {
+            // Clone template
+            const clone = template.content.cloneNode(true);
+            const titleEl = clone.querySelector('.title');
+            
+            // Set text (Safe from XSS)
+            titleEl.textContent = m.title;
+            
+            this.resultsList.appendChild(clone);
+        });
+    }
+
+    clearResults() {
         this.resultsList.innerHTML = '';
-        return;
     }
-
-    // Debounce: wait 300ms 
-    this.debounceTimer = setTimeout(() => {
-      this.executeSearch(query);
-    }, 300);
-  }
-
-  async executeSearch(query) {
-    // Check Cache 
-    if (this.cache.has(query)) {
-      this.render(this.cache.get(query));
-      return;
-    }
-
-    this.container.setAttribute('data-loading', 'true');
-
-    try {
-      // Basic fetch
-      const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=3c0eeb100683cf1c22333b2d9fa29f79&query=${encodeURIComponent(query)}`);
-      if (!response.ok) throw new Error('API error');
-      
-      this.cache.set(query, data.results);
-      this.render(data.results);
-    } catch (err) {
-      console.error("Search failed", err);
-    } finally {
-      this.container.removeAttribute('data-loading');
-    }
-  }
-
-  render(movies) {
-    this.resultsList.innerHTML = ''; 
-    const frag = new DocumentFragment();
-
-    movies.forEach(movie => {
-      const clone = this.template.content.cloneNode(true);
-      clone.querySelector('.title').textContent = movie.title;
-      frag.appendChild(clone);
-    });
-
-    this.resultsList.appendChild(frag);
-  }
 }
 
+// Start
 new SearchComponent();
