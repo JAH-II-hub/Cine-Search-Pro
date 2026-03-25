@@ -1,0 +1,3 @@
+# .gitignore
+config.js
+.DS_Store
